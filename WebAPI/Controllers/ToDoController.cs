@@ -2,98 +2,92 @@
 using DAL.Repository;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebAPI.Controllers
+namespace WebAPI.Controllers;
+
+[Route("[controller]")]
+[ApiController]
+public class ToDoController : ControllerBase
 {
-    [Route("[controller]")]
-    [ApiController]
-    public class ToDoController : ControllerBase
+    private readonly IToDoRepository _db;
+
+    public ToDoController(IToDoRepository db)
     {
-        private readonly IToDoRepository _db;
+        _db = db;
+    }
 
-        public ToDoController(IToDoRepository db)
+    [HttpGet]
+    public ActionResult<IEnumerable<ToDo>> Get()
+    {
+        return Ok(_db.ReadAll());
+    }
+
+    [HttpGet("{id}")]
+    public ActionResult<ToDo> Get(int id)
+    {
+        try
         {
-            _db = db;
+            var toDo = _db.Read(toDo => toDo.Id == id).SingleOrDefault();
+
+            if (toDo == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(toDo);
         }
-
-        // GET: <ToDoController>
-        [HttpGet]
-        public ActionResult<IEnumerable<ToDo>> Get()
+        catch
         {
-            return Ok(_db.ReadAll());
+            return BadRequest();
         }
+    }
 
-        // GET <ToDoController>/5
-        [HttpGet("{id}")]
-        public ActionResult<ToDo> Get(int id)
+    [HttpPost]
+    public IActionResult Post([FromBody] ToDo toDo)
+    {
+        try
         {
-            try
-            {
-                var toDo = _db.Read(toDo => toDo.Id == id).SingleOrDefault();
+            _db.Add(toDo);
 
-                if (toDo == null)
-                {
-                    return NotFound();
-                }
-
-                return Ok(toDo);
-            }
-            catch
-            {
-                return BadRequest();
-            }
+            return Created("ToDo created - ", toDo);
         }
-
-        // POST <ToDoController>
-        [HttpPost]
-        public IActionResult Post([FromBody] ToDo toDo)
+        catch (Exception ex)
         {
-            try
-            {
-                _db.Add(toDo);
-
-                return Created("ToDo created - ", toDo);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Exeption - {ex.Message}");
-            }
+            return BadRequest($"Exeption - {ex.Message}");
         }
+    }
 
-        // PUT <ToDoController>/5
-        [HttpPut]
-        public IActionResult Put([FromBody] ToDo toDo)
+    [HttpPut]
+    public IActionResult Put([FromBody] ToDo toDo)
+    {
+        try
         {
-            try
-            {
-                _db.Update(toDo);
+            _db.Update(toDo);
 
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Exeption - {ex.Message}");
-            }
+            return Ok();
         }
-
-        // DELETE <ToDoController>/5
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        catch (Exception ex)
         {
-            try
-            {
-                if (!_db.CheckAnyByFilter(x => x.Id == id))
-                {
-                    return NotFound();
-                }
+            return BadRequest($"Exeption - {ex.Message}");
+        }
+    }
 
-                _db.Delete(x => x.Id == id);
-
-                return Ok();
-            }
-            catch (Exception ex)
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
+    {
+        try
+        {
+            if (!_db.CheckAnyByFilter(x => x.Id == id))
             {
-                return BadRequest($"Exeption - {ex.Message}");
+                return NotFound();
             }
+
+            _db.Delete(x => x.Id == id);
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Exeption - {ex.Message}");
         }
     }
 }

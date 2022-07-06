@@ -2,73 +2,72 @@
 using DAL.Data;
 using System.Linq.Expressions;
 
-namespace DAL.Repository
+namespace DAL.Repository;
+
+public class ToDoRepository : IToDoRepository
 {
-    public class ToDoRepository : IToDoRepository
+    private readonly AppDbContext _db;
+
+    public ToDoRepository(AppDbContext db)
     {
-        private readonly AppDbContext _db;
+        _db = db;
+        _db.Database.EnsureCreated();
+    }
 
-        public ToDoRepository(AppDbContext db)
+    public void Add(ToDo toDo)
+    {
+        toDo.LastTimeEditied = DateTime.Now;
+
+        _db.ToDos.Add(toDo);
+        _db.SaveChanges();
+    }
+
+    public bool CheckAllByFilter(Expression<Func<ToDo, bool>> filter)
+    {
+        if (_db.ToDos.All(filter))
         {
-            _db = db;
-            _db.Database.EnsureCreated();
+            return true;
         }
 
-        public void Add(ToDo toDo)
-        {
-            toDo.LastTimeEditied = DateTime.Now;
+        return false;
+    }
 
-            _db.ToDos.Add(toDo);
-            _db.SaveChanges();
+    public bool CheckAnyByFilter(Expression<Func<ToDo, bool>> filter)
+    {
+        if (_db.ToDos.Any(filter))
+        {
+            return true;
         }
 
-        public bool CheckAllByFilter(Expression<Func<ToDo, bool>> filter)
-        {
-            if (_db.ToDos.All(filter))
-            {
-                return true;
-            }
+        return false;
+    }
 
-            return false;
-        }
+    public void Delete(Expression<Func<ToDo, bool>> filter)
+    {
+        var toDo = _db.ToDos.Where(filter).FirstOrDefault();
 
-        public bool CheckAnyByFilter(Expression<Func<ToDo, bool>> filter)
-        {
-            if (_db.ToDos.Any(filter))
-            {
-                return true;
-            }
+        _db.ToDos.Remove(toDo!);
 
-            return false;
-        }
+        _db.SaveChanges();
+    }
 
-        public void Delete(Expression<Func<ToDo, bool>> filter)
-        {
-            var toDo = _db.ToDos.Where(filter).FirstOrDefault();
+    public IEnumerable<ToDo> Read(Expression<Func<ToDo, bool>> filter)
+    {
+        var toDo = _db.ToDos.Where(filter);
 
-            _db.ToDos.Remove(toDo!);
+        return toDo;
+    }
 
-            _db.SaveChanges();
-        }
+    public IEnumerable<ToDo> ReadAll()
+    {
+        return _db.ToDos;
+    }
 
-        public IEnumerable<ToDo> Read(Expression<Func<ToDo, bool>> filter)
-        {
-            var toDo = _db.ToDos.Where(filter);
+    public void Update(ToDo toDo)
+    {
+        toDo.LastTimeEditied = DateTime.Now;
 
-            return toDo;
-        }
-
-        public IEnumerable<ToDo> ReadAll()
-        {
-            return _db.ToDos;
-        }
-
-        public void Update(ToDo toDo)
-        {
-            toDo.LastTimeEditied = DateTime.Now;
-
-            _db.Update(toDo);
-            _db.SaveChanges();
-        }
+        _db.Update(toDo);
+        _db.SaveChanges();
     }
 }

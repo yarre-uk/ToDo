@@ -10,8 +10,7 @@ while (true)
 {
     Console.WriteLine("Your toDoes:");
 
-    Thread.Sleep(500);
-    var toDoes = Requests.Get(httpClient).Result;
+    var toDoes = (await Requests.Get(httpClient));
 
     for (int i = 0; i < toDoes.Count(); i++)
     {
@@ -37,7 +36,7 @@ while (true)
 
             var toDO = new ToDo { Data = data };
 
-            Requests.Post(httpClient, toDO);
+            await Requests.Post(httpClient, toDO);
             break;
         }
     }
@@ -72,7 +71,7 @@ while (true)
 
             var toDO = new ToDo { Id = id, Data = data, State = (State)state };
 
-            Requests.Put(httpClient, toDO);
+            await Requests.Put(httpClient, toDO);
             break;
         }
     }
@@ -90,7 +89,7 @@ while (true)
                 continue;
             }
 
-            Requests.Delete(httpClient, id);
+            await Requests.Delete(httpClient, id);
             break;
         }
     }
@@ -101,5 +100,3 @@ while (true)
         continue;
     }
 }
-
-Console.ReadKey();

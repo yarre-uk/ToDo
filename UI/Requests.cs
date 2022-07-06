@@ -22,24 +22,24 @@ public static class Requests
         return toDo!;
     }
 
-    public static async void Post(HttpClient http, ToDo toDo)
+    public static async Task Post(HttpClient http, ToDo toDo)
     {
         StringContent content = new StringContent(JsonConvert.SerializeObject(toDo),
             Encoding.UTF8, "application/json");
 
-        var request = await http.PostAsync("todo", content);
+        await http.PostAsync("todo", content);
     }
 
-    public static async void Put(HttpClient http, ToDo toDo)
+    public static async Task Put(HttpClient http, ToDo toDo)
     {
         StringContent content = new StringContent(JsonConvert.SerializeObject(toDo),
             Encoding.UTF8, "application/json");
 
-        var request = await http.PutAsync("todo", content);
+        await http.PutAsync("todo", content);
     }
 
-    public static async void Delete(HttpClient http, int id)
+    public static async Task Delete(HttpClient http, int id)
     {
-        var request = await http.DeleteAsync($"todo/{id}");
+        await http.DeleteAsync($"todo/{id}");
     }
 }

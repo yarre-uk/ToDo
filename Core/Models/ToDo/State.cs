@@ -1,9 +1,8 @@
-﻿namespace Core.Models.ToDo
+﻿namespace Core.Models.ToDo;
+
+public enum State
 {
-    public enum State
-    {
-        Working,
-        Done,
-        Failed,
-    }
+    Working,
+    Done,
+    Failed,
 }

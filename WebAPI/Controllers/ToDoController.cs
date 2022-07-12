@@ -1,5 +1,5 @@
 ﻿using Core.Models.ToDo;
-using DAL.Repository;
+using DAL.Abstractions.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPI.Controllers;

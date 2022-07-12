@@ -1,7 +1,7 @@
 ﻿using Core.Models.ToDo;
 using System.Linq.Expressions;
 
-namespace DAL.Repository;
+namespace DAL.Abstractions.Interfaces;
 
 public interface IToDoRepository
 {
